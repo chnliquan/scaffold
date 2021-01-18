@@ -53,7 +53,7 @@
     }
   },
   "dependencies": {
-    "@eljs/node-utils": "^0.2.1",
+    "@eljs/node-utils": "^0.2.2",
     "commander": "^7.0.0",
     "fs-extra": "^9.0.1",
     "is-text-path": "^2.0.0",
