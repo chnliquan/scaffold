@@ -1,6 +1,6 @@
 import path from 'path'
 import moment from 'moment'
-import { getGitUrl, getUserAccount, isDirectory, logger, readJSONSync } from '@eljs/node-utils'
+import { getGitUrl, getUserAccount, isDirectory, logger } from '@eljs/node-utils'
 import { Scaffold } from './Scaffold'
 import { ScaffoldConfig, PresetVars } from '../types'
 import { generateScaffold } from '../utils'
@@ -85,8 +85,6 @@ export class ScaffoldManager {
     const gitUrl = getGitUrl(dir)
     const registry =
       execSync('npm config get registry').toString().trim() || 'https://registry.npmjs.org'
-    const pkg = readJSONSync(path.join(dir, 'package.json'))
-    const desc = pkg?.description || 'desc'
     const date = moment().format('YYYY-MM-DD')
     const dateTime = moment().format('YYYY-MM-DD hh:mm:ss')
     const dirname = path.basename(dir)
@@ -96,8 +94,6 @@ export class ScaffoldManager {
       email,
       gitUrl,
       registry,
-      desc,
-      description: desc,
       date,
       dateTime,
       dirname,

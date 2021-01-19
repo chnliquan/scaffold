@@ -74,7 +74,7 @@ async function writeTemplate(
   params: Record<string, any>,
   options: DownloadOptions
 ): Promise<void> {
-  options = options || {}
+  options = options || Object.create(null)
 
   const { verbose, transform } = options
   const names = await fs.readdir(src)
@@ -151,7 +151,7 @@ async function writeTemplate(
         }
 
         if (path.basename(destFile) === 'package.ejs') {
-          destFile = 'package.json'
+          destFile = destFile.replace(/\.ejs$/, '.json')
         }
 
         await fs.writeFile(destFile, content)
@@ -196,8 +196,6 @@ function processAnswers(dest: string, fields: any[], passedParams: Record<string
 
         removeSource(choice.source)
       }
-
-      Reflect.deleteProperty(passedParams, field.name)
     } else {
       if (answer) {
         return false
@@ -273,6 +271,7 @@ export async function generateScaffold(
           camelize,
           dasherize,
         })
+
         safeWriteFileSync(metaFile, content)
 
         const metaData = require(metaFile) || []

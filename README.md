@@ -12,24 +12,32 @@ $ npm i scaffold -g
 $ yarn global scaffold
 ```
 
-## Options
+## Usage
 
-### --type?: 'github' | 'gitlab'
+```bash
+Usage: scaffold <command> [options]
 
-repo type of package
+Options:
+  -v, --version                  output the current version
+  -h, --help                     display help for command
 
-### --group?: string
+Commands:
+  init [options] <package-name>  create a new project
+```
 
-repo group of package
+## Commands 
 
-### --dest?: string
+### `scaffold init`
 
-the location where the project is generated, default `process.cwd()`
+```bash
+Usage: scaffold init [options] <package-name>
 
-### -f | --force?: boolean
+create a new project
 
-overwrite target directory if it exists
-
-### -i | --install?: boolean
-
-automatically install dependencies after downloading
+Options:
+  --template-group <template-group>  Specify the template group
+  --dest <destination>               The location where the project is generated
+  -f, --force                        Overwrite target directory if it exists
+  -i, --install                      Automatically install dependencies after downloading
+  -h, --help                         display help for command
+```

@@ -14,9 +14,20 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Bin scaffold",
+      "program": "${workspaceRoot}/node_modules/ts-node/dist/bin.js",
+      "args": ["bin/scaffold.js", "init", "xxx"],
+      "cwd": "${workspaceRoot}",
+      "protocol": "inspector",
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Jest Current File",
       "program": "${workspaceFolder}/node_modules/.bin/jest",
-      "args": ["${fileBasenameNoExtension}", "--config", "jest.config.js"],
+      "args": ["${fileBasenameNoExtension}", "--config", "jest.config.js", "${file}"],
+      "cwd": "${workspaceRoot}",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,

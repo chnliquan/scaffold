@@ -4,8 +4,7 @@ import { ScaffoldManager } from './core/ScaffoldManager'
 import { scaffoldConfigs } from './config'
 
 export interface InitOptions {
-  type?: 'github' | 'gitlab'
-  group?: string
+  templateGroup?: string
   dest?: string
   force?: boolean
   install?: boolean
@@ -24,25 +23,8 @@ export async function init(projectName: string, options: InitOptions): Promise<v
 
   const scaffoldManager = new ScaffoldManager(targetDir)
 
-  let type = options.type!
-
-  if (!type) {
-    type = await select('Please select the repo type:', [
-      {
-        name: 'Github',
-        value: 'github',
-      },
-      {
-        name: 'Gitlab',
-        value: 'gitlab',
-      },
-    ])
-  }
-
-  const groups = scaffoldConfigs[type]
-
-  for (const groupKey of Object.keys(groups)) {
-    const config = (groups as any)[groupKey]
+  for (const groupKey of Object.keys(scaffoldConfigs)) {
+    const config = (scaffoldConfigs as any)[groupKey]
 
     for (const name of Object.keys(config)) {
       scaffoldManager.addScaffold(`${groupKey}/${name}`, {
@@ -56,10 +38,10 @@ export async function init(projectName: string, options: InitOptions): Promise<v
 
   const initGroups: any = scaffoldManager.getGroups()
 
-  let group: any = options.group
+  let templateGroup: any = options.templateGroup
 
-  if (!group) {
-    group = await select(
+  if (!templateGroup) {
+    templateGroup = await select(
       'Please select initial group:',
       Object.keys(initGroups).map(group => ({
         name: initGroups[group],
@@ -68,7 +50,7 @@ export async function init(projectName: string, options: InitOptions): Promise<v
     )
   }
 
-  const scaffolds = scaffoldManager.getScaffolds(group)
+  const scaffolds = scaffoldManager.getScaffolds(templateGroup)
   const name = await select(
     'Please select an initial template',
     Object.keys(scaffolds).map(key => ({
@@ -77,7 +59,7 @@ export async function init(projectName: string, options: InitOptions): Promise<v
     }))
   )
 
-  const scaffold = scaffoldManager.getScaffold(`${group}/${name}`)
+  const scaffold = scaffoldManager.getScaffold(`${templateGroup}/${name}`)
 
   if (!scaffold || !(await scaffold.checkEmpty(targetDir))) {
     return
