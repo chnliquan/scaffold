@@ -4,7 +4,6 @@ export const scaffoldConfigs = {
       label: 'Web 标准组件 - TypeScript',
       template: 'git@github.com:chnliquan/template.git',
       content: 'typescript/web/standard',
-      meta: './meta.js',
       params: {
         name: {
           message: '三方包名称（英文）:',
@@ -23,7 +22,6 @@ export const scaffoldConfigs = {
       label: 'Web 标准组件 - JavaScript',
       template: 'git@github.com:chnliquan/template.git',
       content: 'javascript/web/standard',
-      meta: './meta.js',
       params: {
         name: {
           message: '三方包名称（英文）:',
@@ -42,7 +40,6 @@ export const scaffoldConfigs = {
       label: 'Web Monorepo 仓库 - TypeScript',
       template: 'git@github.com:chnliquan/template.git',
       content: 'typescript/web/monorepo',
-      meta: './meta.js',
       params: {
         name: {
           message: 'Monorepo 包名（英文）:',
@@ -61,7 +58,6 @@ export const scaffoldConfigs = {
       label: 'Web Monorepo 仓库 - JavaScript',
       template: 'git@github.com:chnliquan/template.git',
       content: 'javascript/web/monorepo',
-      meta: './meta.js',
       params: {
         name: {
           message: 'Monorepo 包名（英文）:',
@@ -82,7 +78,6 @@ export const scaffoldConfigs = {
       label: 'Node 标准组件 - TypeScript',
       template: 'git@github.com:chnliquan/template.git',
       content: 'typescript/node/standard',
-      meta: './meta.js',
       params: {
         name: {
           message: 'Node 包名（英文）:',
@@ -101,7 +96,6 @@ export const scaffoldConfigs = {
       label: 'Node 标准组件 - JavaScript',
       template: 'git@github.com:chnliquan/template.git',
       content: 'javascript/node/standard',
-      meta: './meta.js',
       params: {
         name: {
           message: 'Node 包名（英文）:',
@@ -120,7 +114,6 @@ export const scaffoldConfigs = {
       label: 'Node Monorepo 仓库 - TypeScript',
       template: 'git@github.com:chnliquan/template.git',
       content: 'typescript/node/monorepo',
-      meta: './meta.js',
       params: {
         name: {
           message: 'Node Monorepo 包名（英文）:',
@@ -139,7 +132,6 @@ export const scaffoldConfigs = {
       label: 'Node Monorepo 仓库 - JavaScript',
       template: 'git@github.com:chnliquan/template.git',
       content: 'javascript/node/monorepo',
-      meta: './meta.js',
       params: {
         name: {
           message: 'Node Monorepo 包名（英文）:',
