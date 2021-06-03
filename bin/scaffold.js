@@ -15,7 +15,8 @@ program
 program
   .command('init <package-name>')
   .description('create a new project')
-  .option('--template-group <template-group>', 'Specify the template group')
+  .option('--platform <platform>', 'Specify the template platform')
+  .option('--group <group>', 'Specify the template group')
   .option('--dest <destination>', 'The location where the project is generated')
   .option('-f, --force', 'Overwrite target directory if it exists')
   .option('-i, --install', 'Automatically install dependencies after downloading')

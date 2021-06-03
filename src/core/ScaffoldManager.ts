@@ -2,7 +2,7 @@ import path from 'path'
 import moment from 'moment'
 import { getGitUrl, getUserAccount, isDirectory, logger } from '@eljs/node-utils'
 import { Scaffold } from './Scaffold'
-import { ScaffoldConfig, PresetVars } from '../types'
+import { ScaffoldConfig } from '../types'
 import { generateScaffold } from '../utils'
 import { execSync } from 'child_process'
 
@@ -11,6 +11,7 @@ const INIT_GROUPS = {
   node: 'Node Package',
   react: 'React Application',
   vue: 'Vue Application',
+  plugin: 'Eljs Plugin',
 }
 
 export type GroupKeys = keyof typeof INIT_GROUPS
@@ -39,8 +40,8 @@ export class ScaffoldManager {
 
   addScaffold(type: string, scaffold: ScaffoldConfig): Scaffold | false {
     const pieces = type.split('/')
-    const group = pieces[0] as GroupKeys
-    const name = pieces[1]
+    const group = pieces.shift() as GroupKeys
+    const name = pieces.join('/')
 
     if (!(group in INIT_GROUPS)) {
       logger.error(
@@ -59,8 +60,8 @@ export class ScaffoldManager {
 
   getScaffold(type: string): Scaffold | undefined {
     const pieces = type.split('/')
-    const group = pieces[0] as GroupKeys
-    const name = pieces[1]
+    const group = pieces.shift() as GroupKeys
+    const name = pieces.join('/')
 
     if (this.scaffolds[group] && this.scaffolds[group][name]) {
       return this.scaffolds[group][name]
@@ -80,7 +81,7 @@ export class ScaffoldManager {
     return groups
   }
 
-  getPresetVars(dir: string): PresetVars {
+  getPresetVars(dir: string): Record<string, any> {
     const { name, email } = getUserAccount()
     const gitUrl = getGitUrl(dir)
     const registry =
@@ -101,7 +102,7 @@ export class ScaffoldManager {
   }
 
   async generate(scaffold: Scaffold): Promise<void> {
-    const presets: any = this.getPresetVars(this.targetDir)
+    const presets = this.getPresetVars(this.targetDir)
     const fields = await scaffold.getFields(presets)
 
     await generateScaffold(this.targetDir, scaffold.template, {

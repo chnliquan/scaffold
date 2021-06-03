@@ -4,7 +4,8 @@ import { ScaffoldManager } from './core/ScaffoldManager'
 import { scaffoldConfigs } from './config'
 
 export interface InitOptions {
-  templateGroup?: string
+  platform?: 'github' | 'gitlab'
+  group?: string
   dest?: string
   force?: boolean
   install?: boolean
@@ -38,10 +39,25 @@ export async function init(projectName: string, options: InitOptions): Promise<v
 
   const initGroups: any = scaffoldManager.getGroups()
 
-  let templateGroup: any = options.templateGroup
+  let platform = options.platform
 
-  if (!templateGroup) {
-    templateGroup = await select(
+  if (!platform) {
+    platform = await select('Please select platform:', [
+      {
+        name: 'github',
+        value: 'github',
+      },
+      {
+        name: 'gitlab',
+        value: 'gitlab',
+      },
+    ])
+  }
+
+  let group: any = options.group
+
+  if (!group) {
+    group = await select(
       'Please select initial group:',
       Object.keys(initGroups).map(group => ({
         name: initGroups[group],
@@ -50,16 +66,17 @@ export async function init(projectName: string, options: InitOptions): Promise<v
     )
   }
 
-  const scaffolds = scaffoldManager.getScaffolds(templateGroup)
+  const scaffolds = scaffoldManager.getScaffolds(group)
+
   const name = await select(
-    'Please select an initial template',
+    'Please select an initial template:',
     Object.keys(scaffolds).map(key => ({
       name: scaffolds[key].label,
       value: key,
     }))
   )
 
-  const scaffold = scaffoldManager.getScaffold(`${templateGroup}/${name}`)
+  const scaffold = scaffoldManager.getScaffold(`${group}/${name}`)
 
   if (!scaffold || !(await scaffold.checkEmpty(targetDir))) {
     return
@@ -69,8 +86,12 @@ export async function init(projectName: string, options: InitOptions): Promise<v
 
   if (shouldInitGit) {
     logger.info(`Initializing git repository...`)
-    await run('git init')
+    await run('git init', {
+      cwd: targetDir,
+    })
   }
+
+  scaffold.content = `${platform}/${scaffold.content}`
 
   await scaffoldManager.generate(scaffold)
 

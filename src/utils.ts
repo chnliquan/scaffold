@@ -209,6 +209,7 @@ function processAnswers(dest: string, fields: any[], passedParams: Record<string
 function convertFile(template: string, tmpDir: string, other = ''): string {
   const repo = normalizeRepo(template)
   const srcFile = `${repo.href}/${tmpDir.replace(/[\s\S]+package\//, '')}/${other}`
+
   return srcFile
 }
 
