@@ -1,9 +1,9 @@
-## [Changes](https://github.com/chnliquan/scaffold/compare/v0.1.3...v0.1.4) (2022-02-21)
+## [Changes](https://github.com/chnliquan/scaffold/compare/v0.1.4...v0.1.5) (2022-02-21)
 
 
-### ♻ Code Refactoring
+### ✨ Features
 
-* export scallfold ([e4c5ec3](https://github.com/chnliquan/scaffold/commit/e4c5ec3787057199a4269dcc21b30868ffd9aab9))
+* support pass generate options ([8ac82bc](https://github.com/chnliquan/scaffold/commit/8ac82bca54c6d02d43cde8ba120723ea4aac1b7a))
 
 
 
