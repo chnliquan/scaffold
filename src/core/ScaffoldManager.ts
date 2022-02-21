@@ -1,10 +1,11 @@
 import path from 'path'
+import { execSync } from 'child_process'
 import moment from 'moment'
 import { getGitUrl, getUserAccount, isDirectory, logger } from '@eljs/node-utils'
 import { Scaffold } from './Scaffold'
-import { ScaffoldConfig } from '../types'
 import { generateScaffold } from '../utils'
-import { execSync } from 'child_process'
+
+import { ScaffoldConfig, DownloadOptions } from '../types'
 
 const INIT_GROUPS = {
   web: 'Web Package',
@@ -101,11 +102,15 @@ export class ScaffoldManager {
     }
   }
 
-  async generate(scaffold: Scaffold): Promise<void> {
+  async generate(
+    scaffold: Scaffold,
+    options: DownloadOptions = Object.create(null)
+  ): Promise<void> {
     const presets = this.getPresetVars(this.targetDir)
     const fields = await scaffold.getFields(presets)
 
     await generateScaffold(this.targetDir, scaffold.template, {
+      ...options,
       presets,
       fields,
       label: scaffold.label,
