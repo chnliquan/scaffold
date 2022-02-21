@@ -24,7 +24,7 @@ import {
 } from '@eljs/node-utils'
 import { DownloadOptions } from './types'
 
-async function downloadNpm(npm: string, version: string, tmpdir: string): Promise<string> {
+export async function downloadNpm(npm: string, version: string, tmpdir: string): Promise<string> {
   const parsed = npa(npm)
   const npmName = parsed.name || ''
   const npmSpec = parsed.rawSpec || version
@@ -39,7 +39,7 @@ async function downloadNpm(npm: string, version: string, tmpdir: string): Promis
   return path.join(tmpdir, 'package')
 }
 
-async function cloneGit(gitUrl: string, branch: string, tmpdir: string): Promise<string> {
+export async function cloneGit(gitUrl: string, branch: string, tmpdir: string): Promise<string> {
   branch = branch || 'master'
 
   const cmd = `git clone ${gitUrl} -q -b ${branch} --depth 1 package`
@@ -68,7 +68,7 @@ export async function downloadTemplate(
   }
 }
 
-async function writeTemplate(
+export async function writeTemplate(
   src: string,
   dest: string,
   params: Record<string, any>,
@@ -226,11 +226,11 @@ export async function generateScaffold(
       `Downloading template ${chalk.cyanBright.bold(options.label)}, This might take a while...`,
       downloadTemplate,
       {
-        args: [template, tmpdir(true), options],
+        args: [template, tmp, options],
       }
     )
 
-    let pkgDir = path.join(templateDir)
+    let pkgDir = templateDir
 
     if (options.content) {
       pkgDir = path.join(templateDir, options.content)
@@ -290,7 +290,7 @@ export async function generateScaffold(
     // 2. write file
     await writeTemplate(pkgDir, basedir, presets, options)
   } catch (err) {
-    logger.error(err)
+    logger.error(String(err))
     process.exit(1)
   } finally {
     // 3. remove tmpdir

@@ -1,2 +1,5 @@
 export { ScaffoldManager, GroupKeys } from './core/ScaffoldManager'
-export { generateScaffold } from './utils'
+export * from './core/Scaffold'
+export * from './core/ScaffoldManager'
+export * from './types'
+export * from './utils'
