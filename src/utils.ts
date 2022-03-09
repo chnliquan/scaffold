@@ -42,10 +42,8 @@ export async function downloadNpm(npm: string, version: string, tmpdir: string):
 export async function cloneGit(gitUrl: string, branch: string, tmpdir: string): Promise<string> {
   branch = branch || 'master'
 
-  const cmd = `git clone ${gitUrl} -q -b ${branch} --depth 1 package`
-
   try {
-    await run(cmd, {
+    await run('git', ['clone', gitUrl, '-q', '-b', branch, '--depth', '1', 'package'], {
       cwd: tmpdir,
     })
   } catch (err) {
@@ -221,6 +219,7 @@ export async function generateScaffold(
   const tmp = tmpdir(true)
 
   try {
+    console.log()
     // 1. download template
     const templateDir = await spin(
       `Downloading template ${chalk.cyanBright.bold(options.label)}, This might take a while...`,
@@ -229,6 +228,11 @@ export async function generateScaffold(
         args: [template, tmp, options],
       }
     )
+    console.log()
+
+    process.on('exit', () => {
+      removeSync(tmp)
+    })
 
     let pkgDir = templateDir
 
@@ -237,13 +241,13 @@ export async function generateScaffold(
     }
 
     if (!existsSync(pkgDir)) {
-      logger.error(
+      console.log()
+      logger.printErrorAndExit(
         `The template file ${convertFile(
           template,
           pkgDir
         )} does not exist, please check and try again.`
       )
-      process.exit(1)
     }
 
     const presets = options.presets || Object.create(null)
@@ -253,6 +257,7 @@ export async function generateScaffold(
       const metaFile = path.join(pkgDir, options.meta)
 
       if (!existsSync(metaFile)) {
+        console.log()
         const isOk = await confirm(
           `The template configuration file ${convertFile(
             template,
@@ -290,8 +295,8 @@ export async function generateScaffold(
     // 2. write file
     await writeTemplate(pkgDir, basedir, presets, options)
   } catch (err) {
-    logger.error(String(err))
-    process.exit(1)
+    console.log()
+    logger.printErrorAndExit(String(err))
   } finally {
     // 3. remove tmpdir
     removeSync(tmp)

@@ -1,10 +1,9 @@
 import path from 'path'
 import { existsSync, mkdirSync, select, chalk, run, logger } from '@eljs/node-utils'
 import { ScaffoldManager } from './core/ScaffoldManager'
-import { scaffoldConfigs } from './config'
 
-export interface InitOptions {
-  platform?: 'github' | 'gitlab'
+export interface CreateOptions {
+  configPath: string
   group?: string
   dest?: string
   force?: boolean
@@ -12,24 +11,30 @@ export interface InitOptions {
   forceGit?: boolean
 }
 
-export async function init(projectName: string, options: InitOptions): Promise<void> {
-  const { dest = process.cwd(), force = false, install = false, forceGit } = options
+export async function create(projectName: string, options: CreateOptions): Promise<void> {
+  const { dest = process.cwd(), force = false, install = false, forceGit, configPath } = options
   const targetDir = path.join(dest, projectName)
+  const { default: scaffoldConfigs } = require(configPath)
+
+  if (!scaffoldConfigs) {
+    logger.printErrorAndExit(`The scaffold config should have a default export.`)
+  }
 
   if (!existsSync(targetDir)) {
     mkdirSync(targetDir)
   }
 
+  console.log()
   logger.info(`Creating project in ${chalk.yellow(targetDir)}.`)
 
-  const scaffoldManager = new ScaffoldManager(targetDir)
+  const scaffoldManager = new ScaffoldManager(targetDir, scaffoldConfigs)
 
   for (const groupKey of Object.keys(scaffoldConfigs)) {
-    const config = (scaffoldConfigs as any)[groupKey]
+    const { templates } = scaffoldConfigs[groupKey]
 
-    for (const name of Object.keys(config)) {
-      scaffoldManager.addScaffold(`${groupKey}/${name}`, {
-        ...config[name],
+    for (const template of templates) {
+      scaffoldManager.addScaffold(`${groupKey}/${template.name}`, {
+        ...template,
         autoInstall: install,
         ignoreExists: force,
         forceGit,
@@ -37,30 +42,14 @@ export async function init(projectName: string, options: InitOptions): Promise<v
     }
   }
 
-  const initGroups: any = scaffoldManager.getGroups()
-
-  let platform = options.platform
-
-  if (!platform) {
-    platform = await select('Please select platform:', [
-      {
-        name: 'github',
-        value: 'github',
-      },
-      {
-        name: 'gitlab',
-        value: 'gitlab',
-      },
-    ])
-  }
-
-  let group: any = options.group
+  let group = options.group as string
 
   if (!group) {
+    console.log()
     group = await select(
-      'Please select initial group:',
-      Object.keys(initGroups).map(group => ({
-        name: initGroups[group],
+      'Please select an initialization template group:',
+      Object.keys(scaffoldManager.groups).map(group => ({
+        name: scaffoldManager.groups[group],
         value: group,
       }))
     )
@@ -68,8 +57,9 @@ export async function init(projectName: string, options: InitOptions): Promise<v
 
   const scaffolds = scaffoldManager.getScaffolds(group)
 
+  console.log()
   const name = await select(
-    'Please select an initial template:',
+    'Please select an initialization template:',
     Object.keys(scaffolds).map(key => ({
       name: scaffolds[key].label,
       value: key,
@@ -85,15 +75,15 @@ export async function init(projectName: string, options: InitOptions): Promise<v
   const shouldInitGit = scaffold.shouldInitGit()
 
   if (shouldInitGit) {
+    console.log()
     logger.info(`Initializing git repository...`)
     await run('git init', {
       cwd: targetDir,
     })
   }
 
-  scaffold.content = `${platform}/${scaffold.content}`
-
   await scaffoldManager.generate(scaffold)
 
-  logger.success(`🎉  Created project ${chalk.yellow(projectName)} successfully.`)
+  console.log()
+  logger.success(`🎉  Created project ${chalk.green.bold(projectName)}  successfully.`)
 }

@@ -6,6 +6,7 @@ const chalk = require('chalk')
 const leven = require('leven')
 const { program } = require('commander')
 const { logger, minimist } = require('@eljs/node-utils')
+
 const pkg = require('../package.json')
 
 program
@@ -13,9 +14,9 @@ program
   .usage('<command> [options]')
 
 program
-  .command('init <package-name>')
+  .command('create <package-name>')
   .description('create a new project')
-  .option('--platform <platform>', 'Specify the template platform')
+  .option('--config-path <config-path>', 'The config file path', '../lib/default-config.js')
   .option('--group <group>', 'Specify the template group')
   .option('--dest <destination>', 'The location where the project is generated')
   .option('-f, --force', 'Overwrite target directory if it exists')
@@ -32,8 +33,8 @@ program
       options.forceGit = true
     }
 
-    const { init } = require('../lib/init')
-    init(name, options)
+    const { create } = require('../lib/create')
+    create(name, options)
   })
 
 // output help information on unknown commands

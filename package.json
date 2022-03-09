@@ -24,7 +24,7 @@
     "release:quick": "release --repo-type=github"
   },
   "dependencies": {
-    "@eljs/node-utils": "^0.2.0",
+    "@eljs/node-utils": "^0.4.2",
     "chalk": "^4.1.0",
     "commander": "^7.0.0",
     "fs-extra": "^9.0.1",
@@ -36,7 +36,7 @@
   "devDependencies": {
     "@commitlint/cli": "^9.1.2",
     "@commitlint/config-conventional": "^9.1.2",
-    "@eljs/release": "^0.2.0",
+    "@eljs/release": "^0.5.0",
     "@types/fs-extra": "^9.0.6",
     "@types/jest": "^26.0.20",
     "@types/node": "^14.14.21",

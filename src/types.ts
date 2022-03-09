@@ -15,7 +15,17 @@ export interface DownloadOptions {
   transform?: (type: string, srcFile: string, destFile: string) => string | boolean
 }
 
+export interface ScaffoldConfigs {
+  [group: string]: {
+    label: string
+    templates: ScaffoldConfig[]
+  }
+}
+
 export interface ScaffoldConfig<T extends Answers = Answers> {
+  name: string
+  label: string
+  template: string
   ignoreExists?: boolean
   autoInstall?: boolean
   forceGit?: boolean
@@ -24,8 +34,6 @@ export interface ScaffoldConfig<T extends Answers = Answers> {
   params?: {
     [key: string]: DistinctQuestion<T>
   }
-  label: string
-  template: string
   beforeInit?: AsyncGeneratorFunction
   afterInit?: AsyncGeneratorFunction
 }

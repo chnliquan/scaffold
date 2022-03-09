@@ -1,7 +1,9 @@
+import path from 'path'
 import fs from 'fs'
 import assert from 'assert'
 import { ListQuestion } from 'inquirer'
 import {
+  existsSync,
   Choice,
   confirm,
   hasGit,
@@ -10,7 +12,7 @@ import {
   logger,
   renderTemplate,
   select,
-  spawn,
+  run,
 } from '@eljs/node-utils'
 import { ScaffoldConfig } from '../types'
 
@@ -23,8 +25,8 @@ export class Scaffold {
   public content?: string
 
   constructor(type: string, private context: string, private config: ScaffoldConfig) {
-    assert(config.label, `Expect ${type} to define label but got undefined`)
-    assert(config.template, `Expect ${type} to define template but got undefined`)
+    assert(config.label, `Expect ${type} to define label but got undefined.`)
+    assert(config.template, `Expect ${type} to define template but got undefined.`)
 
     this.label = config.label
     this.meta = config.meta
@@ -110,6 +112,13 @@ export class Scaffold {
       })
     }
 
+    if (existsSync(path.resolve(this.context, 'pnpm-workspace.yaml'))) {
+      installChoices.unshift({
+        name: 'Use Pnpm',
+        value: 'pnpm',
+      })
+    }
+
     if (autoInstall) {
       const pkgManager = await select(
         'Pick the package manager to use when installing dependencies:',
@@ -138,13 +147,13 @@ export class Scaffold {
 
     if (pkgManager === 'yarn') {
       args = []
-    } else if (pkgManager === 'npm') {
-      args = ['install']
+    } else {
+      args = ['i']
     }
 
     try {
       logger.info('Downloading dependency package, please wait...')
-      await spawn(pkgManager, args, {
+      await run(pkgManager, args, {
         cwd: this.context,
         stdio: 'inherit',
       })

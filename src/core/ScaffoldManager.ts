@@ -1,30 +1,28 @@
 import path from 'path'
 import { execSync } from 'child_process'
 import moment from 'moment'
-import { getGitUrl, getUserAccount, isDirectory, logger } from '@eljs/node-utils'
+import {
+  camelize,
+  getGitUrl,
+  normalizeRepo,
+  getUserAccount,
+  isDirectory,
+  logger,
+} from '@eljs/node-utils'
 import { Scaffold } from './Scaffold'
 import { generateScaffold } from '../utils'
 
-import { ScaffoldConfig, DownloadOptions } from '../types'
+import { ScaffoldConfig, DownloadOptions, ScaffoldConfigs } from '../types'
 
-const INIT_GROUPS = {
-  web: 'Web Package',
-  node: 'Node Package',
-  react: 'React Application',
-  vue: 'Vue Application',
-  plugin: 'Eljs Plugin',
-}
-
-export type GroupKeys = keyof typeof INIT_GROUPS
-
-interface ScaffoldMap {
+interface Scaffolds {
   [key: string]: Scaffold
 }
 
 export class ScaffoldManager {
-  private scaffolds: Record<GroupKeys, ScaffoldMap>
+  private _scaffolds: Record<string, Scaffolds>
+  private _groups: Record<string, string> = Object.create(null)
 
-  constructor(private targetDir = process.cwd()) {
+  constructor(private readonly targetDir = process.cwd(), configs: ScaffoldConfigs) {
     if (!isDirectory(targetDir)) {
       logger.error(
         `The execution path ${targetDir} is not a folder, please initialize the project in the folder.`
@@ -32,59 +30,52 @@ export class ScaffoldManager {
       process.exit(1)
     }
 
-    this.scaffolds = Object.create(null)
+    this._scaffolds = Object.create(null)
 
-    for (const group in INIT_GROUPS) {
-      this.scaffolds[group as GroupKeys] = Object.create(null)
+    for (const group of Object.keys(configs)) {
+      this._scaffolds[group] = Object.create(null)
+      this._groups[group] = configs[group].label || camelize(group)
     }
+  }
+
+  get groups(): Record<string, string> {
+    return this._groups
   }
 
   addScaffold(type: string, scaffold: ScaffoldConfig): Scaffold | false {
     const pieces = type.split('/')
-    const group = pieces.shift() as GroupKeys
+    const group = pieces.shift() as string
     const name = pieces.join('/')
 
-    if (!(group in INIT_GROUPS)) {
+    if (!(group in this.groups)) {
       logger.error(
         `The current scaffolding group ${group} is not supported, the current type is: ${type}.`
       )
       return false
     }
 
-    this.scaffolds[group][name] = new Scaffold(type, this.targetDir, scaffold)
-    return this.scaffolds[group][name]
+    this._scaffolds[group][name] = new Scaffold(type, this.targetDir, scaffold)
+    return this._scaffolds[group][name]
   }
 
-  getScaffolds(group: GroupKeys): ScaffoldMap {
-    return this.scaffolds[group] || {}
+  getScaffolds(group: string): Scaffolds {
+    return this._scaffolds[group] || {}
   }
 
   getScaffold(type: string): Scaffold | undefined {
     const pieces = type.split('/')
-    const group = pieces.shift() as GroupKeys
+    const group = pieces.shift() as string
     const name = pieces.join('/')
 
-    if (this.scaffolds[group] && this.scaffolds[group][name]) {
-      return this.scaffolds[group][name]
+    if (this._scaffolds[group] && this._scaffolds[group][name]) {
+      return this._scaffolds[group][name]
     }
-  }
-
-  getGroups(): Partial<typeof INIT_GROUPS> {
-    const exists = Object.keys(this.scaffolds).filter(group => {
-      return Object.keys(this.scaffolds[group as GroupKeys]).length > 0
-    })
-    const groups = Object.create(null)
-
-    exists.forEach(group => {
-      groups[group] = INIT_GROUPS[group as GroupKeys]
-    })
-
-    return groups
   }
 
   getPresetVars(dir: string): Record<string, any> {
     const { name, email } = getUserAccount()
     const gitUrl = getGitUrl(dir)
+    const { href: gitHref } = normalizeRepo(gitUrl)
     const registry =
       execSync('npm config get registry').toString().trim() || 'https://registry.npmjs.org'
     const date = moment().format('YYYY-MM-DD')
@@ -95,6 +86,7 @@ export class ScaffoldManager {
       author: name,
       email,
       gitUrl,
+      gitHref,
       registry,
       date,
       dateTime,

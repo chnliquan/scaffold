@@ -16,7 +16,7 @@
       "request": "launch",
       "name": "Bin scaffold",
       "program": "${workspaceRoot}/node_modules/ts-node/dist/bin.js",
-      "args": ["bin/scaffold.js", "init", "xxx"],
+      "args": ["bin/scaffold.js", "create", "xxx"],
       "cwd": "${workspaceRoot}",
       "protocol": "inspector",
       "console": "integratedTerminal"

@@ -1,5 +1,7 @@
-export { ScaffoldManager, GroupKeys } from './core/ScaffoldManager'
-export * from './core/Scaffold'
-export * from './core/ScaffoldManager'
-export * from './types'
+export { ScaffoldManager } from './core/ScaffoldManager'
+export { Scaffold } from './core/Scaffold'
+export { create } from './create'
+export { default as defaultConfig } from './default-config'
+
 export * from './utils'
+export * from './types'
