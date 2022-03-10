@@ -1,6 +1,6 @@
-export { ScaffoldManager } from './core/ScaffoldManager'
+export { ScaffoldManager, Scaffolds } from './core/ScaffoldManager'
 export { Scaffold } from './core/Scaffold'
-export { create } from './create'
+export { create, CreateOptions } from './create'
 export { default as defaultConfig } from './default-config'
 
 export * from './utils'

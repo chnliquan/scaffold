@@ -14,7 +14,7 @@ import { generateScaffold } from '../utils'
 
 import { ScaffoldConfig, DownloadOptions, ScaffoldConfigs } from '../types'
 
-interface Scaffolds {
+export interface Scaffolds {
   [key: string]: Scaffold
 }
 
