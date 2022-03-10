@@ -3,6 +3,7 @@ import fs from 'fs'
 import assert from 'assert'
 import { ListQuestion } from 'inquirer'
 import {
+  chalk,
   existsSync,
   Choice,
   confirm,
@@ -74,10 +75,13 @@ export class Scaffold {
     })
 
     if (files.length) {
-      logger.warn(`The following files exist in the current directory ${dir}:\n`)
+      logger.warn(`The following files exist in the current directory ${chalk.bold(dir)}:\n`)
       files.forEach(file => console.log(' - ' + file))
       console.log()
-      return confirm(`Are you sure you want to initialize ${label} in this directory?`, true)
+      return confirm(
+        `Are you sure you want to initialize ${chalk.cyanBright.bold(label)} in this directory?`,
+        true
+      )
     }
 
     return true
