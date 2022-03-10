@@ -1,7 +1,7 @@
 {
   "name": "@eljs/scaffold",
   "version": "0.2.0",
-  "description": "Lightweight scaffolding tool",
+  "description": "lightweight scaffolding tool",
   "keywords": [
     "node scaffold",
     "cli"

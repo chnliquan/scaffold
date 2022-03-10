@@ -1,15 +1,15 @@
 # scaffold
 
-Lightweight scaffolding tool
+lightweight scaffolding tool
 
 ## Install
 
 ```bash
-$ npm i scaffold -g
+$ npm i @eljs/scaffold -g
 ```
 
 ```bash
-$ yarn global scaffold
+$ yarn global @eljs/scaffold
 ```
 
 ## Usage
@@ -22,22 +22,23 @@ Options:
   -h, --help                     display help for command
 
 Commands:
-  init [options] <package-name>  create a new project
+  create [options] <package-name>  create a new project
 ```
 
 ## Commands 
 
-### `scaffold init`
+### `scaffold create`
 
 ```bash
-Usage: scaffold init [options] <package-name>
+Usage: scaffold create [options] <package-name>
 
-create a new project
+create a project based on the configuration
 
 Options:
-  --template-group <template-group>  Specify the template group
-  --dest <destination>               The location where the project is generated
-  -f, --force                        Overwrite target directory if it exists
-  -i, --install                      Automatically install dependencies after downloading
-  -h, --help                         display help for command
+  --config-path <config-path>  The config file path (default: "../dist/default-config.js")
+  --group <group>              Specify the template group
+  --dest <destination>         The location where the project is generated
+  -f, --force                  Overwrite target directory if it exists
+  -i, --install                Automatically install dependencies after downloading
+  -h, --help                   display help for command
 ```

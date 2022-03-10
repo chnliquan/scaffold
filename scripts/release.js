@@ -21,7 +21,7 @@ async function main() {
   logger.step('Running tests ...')
   if (!skipTests) {
     await run(bin('jest'), ['--clearCache'])
-    await run('pnpm', ['test:once', '--', '--bail'])
+    await run('npm', ['test:once', '--', '--bail'])
   } else {
     console.log(`(skipped)`)
   }
@@ -29,7 +29,7 @@ async function main() {
   // build packages with types
   logger.step('Building package ...')
   if (!skipBuild) {
-    await run('pnpm', ['run', 'build', '--', '--release'])
+    await run('npm', ['run', 'build', '--', '--release'])
   } else {
     console.log(`(skipped)`)
   }

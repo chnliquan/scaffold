@@ -49,6 +49,8 @@ async function main() {
       .join(','),
   ])
 
+  await run(bin('tsc'), ['-p', 'tsconfig.build.json'])
+
   // build types
   if (buildTypes && pkg.types) {
     step(`Rolling up type definitions for ${chalk.cyanBright.bold(pkg.name)}`)

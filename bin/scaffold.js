@@ -15,8 +15,8 @@ program
 
 program
   .command('create <package-name>')
-  .description('create a new project')
-  .option('--config-path <config-path>', 'The config file path', '../lib/default-config.js')
+  .description('create a project based on the configuration')
+  .option('--config-path <config-path>', 'The config file path', '../dist/default-config.js')
   .option('--group <group>', 'Specify the template group')
   .option('--dest <destination>', 'The location where the project is generated')
   .option('-f, --force', 'Overwrite target directory if it exists')
