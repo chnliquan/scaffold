@@ -85,6 +85,12 @@ export default {
             message: 'Please enter the author of this project:',
             default: '<%= author %>',
           },
+          cli: {
+            type: 'confirm',
+            message: 'Will this project provide command line tools?:',
+            default: true,
+            source: 'bin/',
+          },
         },
       },
     ],

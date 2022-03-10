@@ -24,7 +24,7 @@
     "release:quick": "release --repo-type=github"
   },
   "dependencies": {
-    "@eljs/node-utils": "^0.4.2",
+    "@eljs/node-utils": "^0.6.0",
     "chalk": "^4.1.0",
     "commander": "^7.0.0",
     "fs-extra": "^9.0.1",

@@ -32,7 +32,9 @@ export interface ScaffoldConfig<T extends Answers = Answers> {
   meta?: string
   content?: string
   params?: {
-    [key: string]: DistinctQuestion<T>
+    [key: string]: DistinctQuestion<T> & {
+      source?: string | string[]
+    }
   }
   beforeInit?: AsyncGeneratorFunction
   afterInit?: AsyncGeneratorFunction

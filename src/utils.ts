@@ -18,11 +18,19 @@ import {
   confirm,
   safeWriteFileSync,
   loopAsk,
+  ask,
   chalk,
   camelize,
   dasherize,
 } from '@eljs/node-utils'
 import { DownloadOptions } from './types'
+
+function render(content: string, data: Record<string, any> = {}) {
+  return renderTemplate(content, data, {
+    _with: false,
+    context: data,
+  })
+}
 
 export async function downloadNpm(npm: string, version: string, tmpdir: string): Promise<string> {
   const parsed = npa(npm)
@@ -87,7 +95,7 @@ export async function writeTemplate(
     // modify dest file name
     let destFile = path.join(
       dest,
-      await renderTemplate(name, {
+      await render(name, {
         ...params,
         extract,
         camelize,
@@ -107,7 +115,7 @@ export async function writeTemplate(
         await fs.mkdir(destFile)
 
         if (verbose) {
-          logger.info(' +', options.basedir ? path.relative(options.basedir, destFile) : destFile)
+          logger.info(` +${options.basedir ? path.relative(options.basedir, destFile) : destFile}`)
         }
       }
       await writeTemplate(srcFile, destFile, params, options)
@@ -118,14 +126,14 @@ export async function writeTemplate(
         await fs.mkdir(dirname)
 
         if (verbose) {
-          logger.info(' +', options.basedir ? path.relative(options.basedir, destFile) : dirname)
+          logger.info(` +${options.basedir ? path.relative(options.basedir, destFile) : dirname}`)
         }
       }
 
       // only copy text file
-      if (isTextPath(srcFile)) {
+      if (isTextPath(srcFile) || srcFile.endsWith('.npmrc')) {
         let content = await fs.readFile(srcFile, 'utf8')
-        content = await renderTemplate(content, {
+        content = await render(content, {
           ...params,
           extract,
           camelize,
@@ -158,27 +166,18 @@ export async function writeTemplate(
       }
 
       if (verbose) {
-        logger.info(' +', options.basedir ? path.relative(options.basedir, destFile) : destFile)
+        logger.info(` +${options.basedir ? path.relative(options.basedir, destFile) : destFile}`)
       }
     }
   }
 }
 
-function processAnswers(dest: string, fields: any[], passedParams: Record<string, any>): void {
-  const removeSource = (sourceFile?: string | string[]): void => {
-    if (sourceFile) {
-      if (typeof sourceFile === 'string') {
-        sourceFile = [sourceFile]
-      }
-
-      sourceFile.forEach(source => {
-        removeSync(path.join(dest, source))
-      })
-    }
-  }
+function formatAnswers(dest: string, fields: any[], answers: Record<string, any>) {
+  const formattedAnswers = Object.create(null)
+  let removes: string[] = []
 
   fields.forEach(field => {
-    const answer = passedParams[field.name]
+    const answer = answers[field.name]
 
     if (field.type === 'checkbox' || field.type === 'list') {
       const choices = field.choices
@@ -186,22 +185,25 @@ function processAnswers(dest: string, fields: any[], passedParams: Record<string
       for (const choice of choices) {
         const selected = answer.includes(choice.value)
         // tools: ['dobux', 'swet'] => { dobux: true } { swet: false }
-        passedParams[choice.name.toLowerCase()] = selected
+        formattedAnswers[choice.value.toLowerCase()] = selected
 
-        if (selected) {
-          continue
+        if (!selected && choice.source) {
+          removes = removes.concat(
+            typeof choice.source === 'string' ? [choice.source] : choice.source
+          )
         }
-
-        removeSource(choice.source)
       }
     } else {
-      if (answer) {
-        return false
+      if (!answer && field.source) {
+        removes = removes.concat(typeof field.source === 'string' ? [field.source] : field.source)
       }
-
-      removeSource(field.source)
     }
   })
+
+  return {
+    formattedAnswers: Object.assign(formattedAnswers, answers),
+    removes,
+  }
 }
 
 function convertFile(template: string, tmpDir: string, other = ''): string {
@@ -251,7 +253,9 @@ export async function generateScaffold(
     }
 
     const presets = options.presets || Object.create(null)
-    let fields = options.fields || []
+    const configFields = options.fields || []
+    let totalAnswers = Object.create(null)
+    let totalFields: Record<string, any>[] = configFields
 
     if (options.meta) {
       const metaFile = path.join(pkgDir, options.meta)
@@ -271,29 +275,49 @@ export async function generateScaffold(
           process.exit(1)
         }
       } else {
-        const content = await renderTemplate(fs.readFileSync(metaFile, 'utf8'), {
-          ...presets,
-          extract,
-          camelize,
-          dasherize,
-        })
+        const meteContent = fs.readFileSync(metaFile, 'utf8')
 
-        safeWriteFileSync(metaFile, content)
+        // meta data should compile
+        if (meteContent.indexOf('<%') > -1) {
+          const configAnswers = await ask(configFields, presets)
 
-        const metaData = require(metaFile) || []
-        fields = fields.concat(metaData)
+          const content = await render(meteContent, {
+            ...presets,
+            ...configAnswers,
+            extract,
+            camelize,
+            dasherize,
+          })
+
+          safeWriteFileSync(metaFile, content)
+
+          const metaDataFields = require(metaFile) || []
+          const metaDataAnswers = await ask(metaDataFields)
+
+          totalFields = configFields.concat(metaDataFields)
+          totalAnswers = Object.assign(configAnswers, metaDataAnswers)
+        } else {
+          const metaDataFields = require(metaFile) || []
+
+          totalFields = configFields.concat(metaDataFields)
+          totalAnswers = (await loopAsk(totalFields, presets)) || Object.create(null)
+        }
       }
 
       removeSync(metaFile)
+    } else {
+      totalAnswers = (await loopAsk(configFields, options.presets)) || Object.create(null)
     }
 
-    const passedParams = (await loopAsk(fields, options.presets)) || Object.create(null)
-
-    processAnswers(pkgDir, fields, passedParams)
-    Object.assign(presets, passedParams)
+    const { formattedAnswers, removes } = formatAnswers(pkgDir, totalFields, totalAnswers)
+    Object.assign(presets, formattedAnswers)
 
     // 2. write file
     await writeTemplate(pkgDir, basedir, presets, options)
+
+    if (removes.length > 0) {
+      removes.forEach(toRemove => removeSync(path.resolve(basedir, toRemove)))
+    }
   } catch (err) {
     console.log()
     logger.printErrorAndExit(String(err))

@@ -44,7 +44,7 @@ export class Scaffold {
 
       if (typeof item.default === 'boolean') {
         defaultValue = item.default
-      } else {
+      } else if (item.default) {
         defaultValue = await renderTemplate(item.default || '', presets || {})
       }
 
@@ -55,6 +55,7 @@ export class Scaffold {
         choices: (item as ListQuestion).choices,
         when: item.when,
         default: defaultValue,
+        source: item.source,
       })
     }
 
@@ -157,7 +158,7 @@ export class Scaffold {
         cwd: this.context,
         stdio: 'inherit',
       })
-      logger.success('Dependencies download completely.')
+      logger.done('Dependencies download completely.')
     } catch (error) {
       logger.error(`Dependencies download failed, the reason is as follows\n: ${error}.`)
     }
