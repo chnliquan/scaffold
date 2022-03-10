@@ -85,5 +85,5 @@ export async function create(projectName: string, options: CreateOptions): Promi
   await scaffoldManager.generate(scaffold)
 
   console.log()
-  logger.done(`🎉  Created project ${chalk.green.bold(projectName)}  successfully.`)
+  logger.done(`🎉  Created project ${chalk.green.bold(projectName)} successfully.`)
 }

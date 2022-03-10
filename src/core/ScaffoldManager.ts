@@ -75,12 +75,19 @@ export class ScaffoldManager {
   getPresetVars(dir: string): Record<string, any> {
     const { name, email } = getUserAccount()
     const gitUrl = getGitUrl(dir)
-    const { href: gitHref } = normalizeRepo(gitUrl)
-    const registry =
-      execSync('npm config get registry').toString().trim() || 'https://registry.npmjs.org'
+    const { href: gitHref = '' } = normalizeRepo(gitUrl)
     const date = moment().format('YYYY-MM-DD')
     const dateTime = moment().format('YYYY-MM-DD hh:mm:ss')
     const dirname = path.basename(dir)
+
+    let registry: string
+
+    if (gitHref.includes('github.com')) {
+      registry = 'https://registry.npmjs.org'
+    } else {
+      registry =
+        execSync('npm config get registry').toString().trim() || 'https://registry.npmjs.org'
+    }
 
     return {
       author: name,
