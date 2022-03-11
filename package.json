@@ -27,7 +27,7 @@
     "release": "node scripts/release.js"
   },
   "dependencies": {
-    "@eljs/node-utils": "^0.6.0",
+    "@eljs/node-utils": "0.6.1",
     "commander": "^7.0.0",
     "fs-extra": "^9.0.1",
     "is-text-path": "^2.0.0",

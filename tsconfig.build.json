@@ -1,21 +1,8 @@
 {
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "sourceMap": false,
-    "target": "es2016",
-    "useDefineForClassFields": false,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "allowJs": false,
-    "strict": true,
-    "noUnusedLocals": true,
-    "experimentalDecorators": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "removeComments": false,
-    "jsx": "react",
-    "lib": ["esnext"]
+    "rootDir": "./src",
+    "module": "commonjs"
   },
-  "include": ["src/default-config.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src/default-config.ts"]
 }

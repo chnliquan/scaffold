@@ -21,7 +21,7 @@ async function main() {
   logger.step('Running tests ...')
   if (!skipTests) {
     await run(bin('jest'), ['--clearCache'])
-    await run('npm', ['test:once', '--', '--bail'])
+    await run('npm', ['run', 'test:once', '--', '--bail'])
   } else {
     console.log(`(skipped)`)
   }

@@ -33,8 +33,17 @@ program
       options.forceGit = true
     }
 
-    const { create } = require('../lib/create')
-    create(name, options)
+    const configs = require(options.configPath).default
+
+    if (!configs) {
+      logger.printErrorAndExit(`The scaffold config should have a default export.`)
+    }
+
+    const { create } = require('../dist/scaffold.cjs.js')
+    create(name, {
+      ...options,
+      configs,
+    })
   })
 
 // output help information on unknown commands

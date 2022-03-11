@@ -1,9 +1,10 @@
 import path from 'path'
 import { existsSync, mkdirSync, select, chalk, run, logger } from '@eljs/node-utils'
 import { ScaffoldManager } from './core/ScaffoldManager'
+import { ScaffoldConfigs } from './types'
 
 export interface CreateOptions {
-  configPath: string
+  configs: ScaffoldConfigs
   group?: string
   dest?: string
   force?: boolean
@@ -12,11 +13,11 @@ export interface CreateOptions {
 }
 
 export async function create(projectName: string, options: CreateOptions): Promise<void> {
-  const { dest = process.cwd(), force = false, install = false, forceGit, configPath } = options
+  const { dest = process.cwd(), force = false, install = false, forceGit, configs } = options
   const targetDir = path.join(dest, projectName)
-  const { default: scaffoldConfigs } = require(configPath)
 
-  if (!scaffoldConfigs) {
+  // TODO: support template with no group
+  if (!configs) {
     logger.printErrorAndExit(`The scaffold config should have a default export.`)
   }
 
@@ -27,10 +28,10 @@ export async function create(projectName: string, options: CreateOptions): Promi
   console.log()
   logger.info(`Creating project in ${chalk.yellow(targetDir)}.`)
 
-  const scaffoldManager = new ScaffoldManager(targetDir, scaffoldConfigs)
+  const scaffoldManager = new ScaffoldManager(targetDir, configs)
 
-  for (const groupKey of Object.keys(scaffoldConfigs)) {
-    const { templates } = scaffoldConfigs[groupKey]
+  for (const groupKey of Object.keys(configs)) {
+    const { templates } = configs[groupKey]
 
     for (const template of templates) {
       scaffoldManager.addScaffold(`${groupKey}/${template.name}`, {
