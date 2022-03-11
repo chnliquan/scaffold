@@ -9,6 +9,7 @@ import {
   confirm,
   hasGit,
   hasProjectGit,
+  hasPnpm,
   hasYarn,
   logger,
   renderTemplate,
@@ -117,7 +118,7 @@ export class Scaffold {
       })
     }
 
-    if (existsSync(path.resolve(this.context, 'pnpm-workspace.yaml'))) {
+    if (hasPnpm()) {
       installChoices.unshift({
         name: 'Use Pnpm',
         value: 'pnpm',
