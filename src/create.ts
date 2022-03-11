@@ -78,7 +78,7 @@ export async function create(projectName: string, options: CreateOptions): Promi
   if (shouldInitGit) {
     console.log()
     logger.info(`Initializing git repository...`)
-    await run('git init', {
+    await run('git', ['init'], {
       cwd: targetDir,
     })
   }

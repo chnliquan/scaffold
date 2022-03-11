@@ -1,10 +1,8 @@
-import path from 'path'
 import fs from 'fs'
 import assert from 'assert'
 import { ListQuestion } from 'inquirer'
 import {
   chalk,
-  existsSync,
   Choice,
   confirm,
   hasGit,
