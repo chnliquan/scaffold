@@ -25,7 +25,7 @@ Commands:
   create [options] <package-name>  create a new project
 ```
 
-## Commands 
+## Commands
 
 ### `scaffold create`
 
@@ -42,3 +42,16 @@ Options:
   -i, --install                Automatically install dependencies after downloading
   -h, --help                   display help for command
 ```
+
+## Presets
+
+- `locals.author`：git config user email prefix
+- `locals.email`：git config user email
+- `locals.gitUrl`：git ssh url
+- `locals.gitHref`：git website url
+- `locals.registry`：npm registry
+- `locals.year`：year corresponding to the current time
+- `locals.date`：current time, YYYY-MM-DD
+- `locals.datetime`：current time with time, YYYY-MM-DD hh:mm:ss
+- `locals.dirname`：directory name
+- `locals.shortName`: package name without prefix, `@eljs/scaffold` => `scaffold`
