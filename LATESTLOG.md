@@ -1,9 +1,9 @@
-## [Changes](https://github.com/chnliquan/scaffold/compare/v0.5.0...v0.5.1) (2022-04-18)
+## [Changes](https://github.com/chnliquan/scaffold/compare/v0.5.1...v0.6.0) (2022-04-18)
 
 
-### 🐛 Bug Fixes
+### ✨ Features
 
-* make LICENSE compiled with ejs ([cf9fbf5](https://github.com/chnliquan/scaffold/commit/cf9fbf5d9009567a66498ea78e3e7e784d31a249))
+* add year preset ([8ca6f89](https://github.com/chnliquan/scaffold/commit/8ca6f898f5c5679af4dedcb0953c63f083f097d8))
 
 
 
