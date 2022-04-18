@@ -17,9 +17,6 @@ export async function create(projectName: string, options: CreateOptions): Promi
   const targetDir = path.join(dest, projectName)
 
   // TODO: support template with no group
-  if (!configs) {
-    logger.printErrorAndExit(`The scaffold config should have a default export.`)
-  }
 
   if (!existsSync(targetDir)) {
     mkdirSync(targetDir)
@@ -45,7 +42,7 @@ export async function create(projectName: string, options: CreateOptions): Promi
 
   let group = options.group as string
 
-  if (!group) {
+  if (!group || !Object.keys(configs).includes(group)) {
     console.log()
     group = await select(
       'Please select an initialization template group:',
