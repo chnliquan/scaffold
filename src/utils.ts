@@ -32,6 +32,14 @@ function render(content: string, data: Record<string, any> = {}) {
   })
 }
 
+function presetCamelize(str = '', bigCamelCase = false) {
+  return camelize(str, bigCamelCase)
+}
+
+function presetDasherize(str = '') {
+  return dasherize(str)
+}
+
 export async function downloadNpm(npm: string, version: string, tmpdir: string): Promise<string> {
   const parsed = npa(npm)
   const npmName = parsed.name || ''
@@ -98,8 +106,8 @@ export async function writeTemplate(
       await render(name, {
         ...params,
         extract,
-        camelize,
-        dasherize,
+        camelize: presetCamelize,
+        dasherize: presetDasherize,
       })
     )
     // const matched = name.match(/{{(\w+)}}[\s\S]*\.(\w+)/)
@@ -136,8 +144,8 @@ export async function writeTemplate(
         content = await render(content, {
           ...params,
           extract,
-          camelize,
-          dasherize,
+          camelize: presetCamelize,
+          dasherize: presetDasherize,
         })
 
         if (options.stripBlankLines) {
@@ -194,6 +202,7 @@ function formatAnswers(fields: any[], answers: Record<string, any>) {
         }
       }
     } else {
+      // TODO: handle answer is true and delete opposite
       if (!answer && field.source) {
         removes = removes.concat(typeof field.source === 'string' ? [field.source] : field.source)
       }
@@ -285,8 +294,8 @@ export async function generateScaffold(
             ...presets,
             ...configAnswers,
             extract,
-            camelize,
-            dasherize,
+            camelize: presetCamelize,
+            dasherize: presetDasherize,
           })
 
           safeWriteFileSync(metaFile, content)
@@ -335,7 +344,7 @@ export async function generateScaffold(
   }
 }
 
-export function extract(str: string, reg = /^@\w+\/([\s\S]+)/): string {
+export function extract(str = '', reg = /^@\w+\/([\s\S]+)/): string {
   if (reg.test(str)) {
     return RegExp.$1
   } else {
