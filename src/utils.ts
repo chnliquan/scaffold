@@ -172,7 +172,7 @@ export async function writeTemplate(
   }
 }
 
-function formatAnswers(dest: string, fields: any[], answers: Record<string, any>) {
+function formatAnswers(fields: any[], answers: Record<string, any>) {
   const formattedAnswers = Object.create(null)
   let removes: string[] = []
 
@@ -309,7 +309,15 @@ export async function generateScaffold(
       totalAnswers = (await loopAsk(configFields, options.presets)) || Object.create(null)
     }
 
-    const { formattedAnswers, removes } = formatAnswers(pkgDir, totalFields, totalAnswers)
+    const { formattedAnswers, removes } = formatAnswers(totalFields, totalAnswers)
+
+    if (formattedAnswers?.name || formattedAnswers?.projectName) {
+      formattedAnswers.shortName = (formattedAnswers.name || formattedAnswers.projectName).replace(
+        /^@[\s\S]+\//,
+        ''
+      )
+    }
+
     Object.assign(presets, formattedAnswers)
 
     // 2. write file
