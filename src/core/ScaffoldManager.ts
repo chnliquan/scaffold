@@ -76,6 +76,7 @@ export class ScaffoldManager {
     const { name, email } = getUserAccount()
     const gitUrl = getGitUrl(dir)
     const { href: gitHref = '' } = normalizeRepo(gitUrl)
+    const year = moment().format('YYYY')
     const date = moment().format('YYYY-MM-DD')
     const dateTime = moment().format('YYYY-MM-DD hh:mm:ss')
     const dirname = path.basename(dir)
@@ -95,6 +96,7 @@ export class ScaffoldManager {
       gitUrl,
       gitHref,
       registry,
+      year,
       date,
       dateTime,
       dirname,
