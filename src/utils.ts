@@ -25,6 +25,11 @@ import {
 } from '@eljs/node-utils'
 import { DownloadOptions } from './types'
 
+function isCompiledFile(file: string) {
+  const fileList = ['.npmrc', 'LICENSE']
+  return isTextPath(file) || fileList.some(item => file.endsWith(item))
+}
+
 function render(content: string, data: Record<string, any> = {}) {
   return renderTemplate(content, data, {
     _with: false,
@@ -138,8 +143,7 @@ export async function writeTemplate(
         }
       }
 
-      // only copy text file
-      if (isTextPath(srcFile) || srcFile.endsWith('.npmrc')) {
+      if (isCompiledFile(srcFile)) {
         let content = await fs.readFile(srcFile, 'utf8')
         content = await render(content, {
           ...params,
