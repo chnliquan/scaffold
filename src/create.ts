@@ -1,10 +1,11 @@
 import path from 'path'
 import { existsSync, mkdirSync, select, chalk, run, logger } from '@eljs/node-utils'
 import { ScaffoldManager } from './core/ScaffoldManager'
-import { ScaffoldConfigs } from './types'
+import { DownloadOptions, ScaffoldConfigs } from './types'
 
 export interface CreateOptions {
   configs: ScaffoldConfigs
+  presets?: DownloadOptions['presets']
   group?: string
   dest?: string
   force?: boolean
@@ -13,7 +14,14 @@ export interface CreateOptions {
 }
 
 export async function create(projectName: string, options: CreateOptions): Promise<void> {
-  const { dest = process.cwd(), force = false, install = false, forceGit, configs } = options
+  const {
+    dest = process.cwd(),
+    force = false,
+    install = false,
+    forceGit,
+    configs,
+    presets,
+  } = options
   const targetDir = path.join(dest, projectName)
 
   // TODO: support template with no group
@@ -80,7 +88,9 @@ export async function create(projectName: string, options: CreateOptions): Promi
     })
   }
 
-  await scaffoldManager.generate(scaffold)
+  await scaffoldManager.generate(scaffold, {
+    presets,
+  })
 
   console.log()
   logger.done(`🎉  Created project ${chalk.green.bold(projectName)} successfully.`)

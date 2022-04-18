@@ -105,12 +105,13 @@ export class ScaffoldManager {
     scaffold: Scaffold,
     options: DownloadOptions = Object.create(null)
   ): Promise<void> {
+    const { presets: customerPresets, ...resetOptions } = options
     const presets = this.getPresetVars(this.targetDir)
     const fields = await scaffold.getFields(presets)
 
     await generateScaffold(this.targetDir, scaffold.template, {
-      ...options,
-      presets,
+      ...resetOptions,
+      presets: Object.assign(presets, customerPresets),
       fields,
       label: scaffold.label,
       meta: scaffold.meta,
