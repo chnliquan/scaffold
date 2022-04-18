@@ -1,9 +1,9 @@
-## [Changes](https://github.com/chnliquan/scaffold/compare/v0.4.0...v0.5.0) (2022-04-18)
+## [Changes](https://github.com/chnliquan/scaffold/compare/v0.5.0...v0.5.1) (2022-04-18)
 
 
-### ✨ Features
+### 🐛 Bug Fixes
 
-* support customer presets ([0c49819](https://github.com/chnliquan/scaffold/commit/0c49819903aafd58b0444a4bc09431fa57bf6e1f))
+* make LICENSE compiled with ejs ([cf9fbf5](https://github.com/chnliquan/scaffold/commit/cf9fbf5d9009567a66498ea78e3e7e784d31a249))
 
 
 
