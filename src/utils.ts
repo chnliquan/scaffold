@@ -15,7 +15,6 @@ import {
   spin,
   tmpdir,
   existsSync,
-  confirm,
   safeWriteFileSync,
   loopAsk,
   ask,
@@ -24,26 +23,6 @@ import {
   dasherize,
 } from '@eljs/node-utils'
 import { DownloadOptions } from './types'
-
-function isCompiledFile(file: string) {
-  const fileList = ['.npmrc', 'LICENSE']
-  return isTextPath(file) || fileList.some(item => file.endsWith(item))
-}
-
-function render(content: string, data: Record<string, any> = {}) {
-  return renderTemplate(content, data, {
-    _with: false,
-    context: data,
-  })
-}
-
-function presetCamelize(str = '', bigCamelCase = false) {
-  return camelize(str, bigCamelCase)
-}
-
-function presetDasherize(str = '') {
-  return dasherize(str)
-}
 
 export async function downloadNpm(npm: string, version: string, tmpdir: string): Promise<string> {
   const parsed = npa(npm)
@@ -106,22 +85,7 @@ export async function writeTemplate(
     const name = names[i]
     const srcFile = path.join(src, name)
     // modify dest file name
-    let destFile = path.join(
-      dest,
-      await render(name, {
-        ...params,
-        extract,
-        camelize: presetCamelize,
-        dasherize: presetDasherize,
-      })
-    )
-    // const matched = name.match(/{{(\w+)}}[\s\S]*\.(\w+)/)
-
-    // if (matched && params[matched[1]]?.split('/').length > 1) {
-    //   const pieces = params[matched[1]].split('/')
-
-    //   destFile = path.join(dest, `${pieces[pieces.length - 1]}.${matched[2]}`)
-    // }
+    let destFile = path.join(dest, await render(name, params))
 
     if (isDirectory(srcFile)) {
       if (!fs.existsSync(destFile)) {
@@ -145,12 +109,7 @@ export async function writeTemplate(
 
       if (isCompiledFile(srcFile)) {
         let content = await fs.readFile(srcFile, 'utf8')
-        content = await render(content, {
-          ...params,
-          extract,
-          camelize: presetCamelize,
-          dasherize: presetDasherize,
-        })
+        content = await render(content, params)
 
         if (options.stripBlankLines) {
           content = stripBlankLines(content)
@@ -270,51 +229,32 @@ export async function generateScaffold(
     let totalAnswers = Object.create(null)
     let totalFields: Record<string, any>[] = configFields
 
-    if (options.meta) {
-      const metaFile = path.join(pkgDir, options.meta)
+    const metaFile = path.join(pkgDir, options.meta || '')
 
-      if (!existsSync(metaFile)) {
-        console.log()
-        const isOk = await confirm(
-          `The template configuration file ${convertFile(
-            template,
-            pkgDir,
-            options.meta
-          )} does not exist, whether to continue execution?`,
-          true
-        )
+    if (options.meta && existsSync(metaFile)) {
+      const meteContent = fs.readFileSync(metaFile, 'utf8')
 
-        if (!isOk) {
-          process.exit(1)
-        }
+      // meta data file is ejs template
+      if (meteContent.indexOf('<%') > -1) {
+        const configAnswers = await ask(configFields, presets)
+
+        const content = await render(meteContent, {
+          ...presets,
+          ...configAnswers,
+        })
+
+        safeWriteFileSync(metaFile, content)
+
+        const metaDataFields = require(metaFile) || []
+        totalFields = configFields.concat(metaDataFields)
+
+        const metaDataAnswers = await ask(metaDataFields)
+        totalAnswers = Object.assign(configAnswers, metaDataAnswers)
       } else {
-        const meteContent = fs.readFileSync(metaFile, 'utf8')
+        const metaDataFields = require(metaFile) || []
 
-        // meta data should compile
-        if (meteContent.indexOf('<%') > -1) {
-          const configAnswers = await ask(configFields, presets)
-
-          const content = await render(meteContent, {
-            ...presets,
-            ...configAnswers,
-            extract,
-            camelize: presetCamelize,
-            dasherize: presetDasherize,
-          })
-
-          safeWriteFileSync(metaFile, content)
-
-          const metaDataFields = require(metaFile) || []
-          const metaDataAnswers = await ask(metaDataFields)
-
-          totalFields = configFields.concat(metaDataFields)
-          totalAnswers = Object.assign(configAnswers, metaDataAnswers)
-        } else {
-          const metaDataFields = require(metaFile) || []
-
-          totalFields = configFields.concat(metaDataFields)
-          totalAnswers = (await loopAsk(totalFields, presets)) || Object.create(null)
-        }
+        totalFields = configFields.concat(metaDataFields)
+        totalAnswers = (await loopAsk(totalFields, presets)) || Object.create(null)
       }
 
       removeSync(metaFile)
@@ -348,10 +288,36 @@ export async function generateScaffold(
   }
 }
 
-export function extract(str = '', reg = /^@\w+\/([\s\S]+)/): string {
+function extract(str = '', reg = /^@\w+\/([\s\S]+)/): string {
   if (reg.test(str)) {
     return RegExp.$1
   } else {
     return str
   }
+}
+
+function presetCamelize(str = '', bigCamelCase = false) {
+  return camelize(str, bigCamelCase)
+}
+
+function presetDasherize(str = '') {
+  return dasherize(str)
+}
+
+function render(content: string, data: Record<string, any> = {}) {
+  data = Object.assign({}, data, {
+    extract,
+    camelize: presetCamelize,
+    dasherize: presetDasherize,
+  })
+
+  return renderTemplate(content, data, {
+    _with: false,
+    context: data,
+  })
+}
+
+function isCompiledFile(file: string) {
+  const fileList = ['.npmrc', 'LICENSE']
+  return isTextPath(file) || fileList.some(item => file.endsWith(item))
 }
